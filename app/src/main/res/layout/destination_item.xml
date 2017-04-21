@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <TextView
+        android:text="Destination"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/destination"
+        android:layout_weight="1"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium"
+        android:textAlignment="textStart"
+        android:gravity="center_vertical" />
+
+    <TextView
+        android:text="Time"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/time"
+        android:layout_weight="1"
+        android:gravity="center_vertical|end" />
+
+    <TextView
+        android:text="Price"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/price"
+        android:layout_weight="1"
+        android:gravity="center_vertical|end" />
+
+    <CheckBox
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:id="@+id/checkBox"
+        android:layout_weight="0.1"
+        android:checked="true"
+        android:gravity="center_vertical|end" />
+</LinearLayout>
