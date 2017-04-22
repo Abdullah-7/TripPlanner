@@ -1,11 +1,14 @@
 package com.travel.abd.tripplanner;
 
 import android.content.Context;
+import android.os.Debug;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.TextView;
 
 import java.util.List;
 
@@ -14,6 +17,8 @@ import java.util.List;
  */
 
 public class DestinationAdapter extends ArrayAdapter<Destination> {
+
+
     public DestinationAdapter(Context context, int resource) {
         super(context, resource);
     }
@@ -22,7 +27,6 @@ public class DestinationAdapter extends ArrayAdapter<Destination> {
         super(context, resource, objects);
     }
 
-    @NonNull
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
 
@@ -31,7 +35,15 @@ public class DestinationAdapter extends ArrayAdapter<Destination> {
 
         if(view == null){
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-            layoutInflater.inflate(R.layout.destination_item, null);
+            view = layoutInflater.inflate(R.layout.destination_item, parent, false);
+        }
+        Log.v("Destination", getItem(position).getName() + position);
+        if(view != null) {
+            TextView name = (TextView) view.findViewById(R.id.destination);
+            name.setText(getItem(position).getName());
+
+            TextView cost = (TextView) view.findViewById(R.id.cost);
+            cost.setText(getItem(position).getCost() + getItem(position).getCurrency());
         }
         return view;
     }

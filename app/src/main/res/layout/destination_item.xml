@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
+    android:layout_height="40dp"
     android:orientation="horizontal">
 
     <TextView
@@ -14,29 +14,19 @@
         android:layout_weight="1"
         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
         android:textAlignment="textStart"
-        android:gravity="center_vertical" />
+        android:gravity="center_vertical"
+        android:textStyle="normal|bold"
+        android:paddingLeft="10dp" />
 
     <TextView
-        android:text="Time"
+        android:text="Cost"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
-        android:id="@+id/time"
-        android:layout_weight="1"
-        android:gravity="center_vertical|end" />
+        android:id="@+id/cost"
+        android:layout_weight="0.2"
+        android:gravity="center_vertical|end"
+        android:textAlignment="center"
+        android:textAllCaps="false"
+        android:textStyle="normal|bold" />
 
-    <TextView
-        android:text="Price"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/price"
-        android:layout_weight="1"
-        android:gravity="center_vertical|end" />
-
-    <CheckBox
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:id="@+id/checkBox"
-        android:layout_weight="0.1"
-        android:checked="true"
-        android:gravity="center_vertical|end" />
 </LinearLayout>
