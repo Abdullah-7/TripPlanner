@@ -5,6 +5,8 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.icu.util.Currency;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.InputType;
@@ -31,6 +33,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -41,9 +44,10 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
 
     private static final String LOG_TAG = "Google Places Autocomplete";
     private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
+    private static final String TYPE_DETAILS = "/details";
     private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
     private static final String OUT_JSON = "/json";
-    private static final String GOOGLE_PLACE_API_KEY = "AIzaSyCh_jbg0EgPTBG7whTZTrpNu7Eyhjc2D9U";
+    private static final String GOOGLE_PLACE_API_KEY = "AIzaSyBIgDpTIPVnzY-unDB3_axxMGLPS4Hl8js";
 
     private AutoCompleteTextView name;
     private EditText from;
@@ -51,13 +55,6 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
     private EditText cost;
     private AutoCompleteTextView currnecy;
     private Button add;
-
-    //values
-//    private String name;
-//    private Date fromDate;
-//    private Date toDate;
-//    private double estimatedCost;
-//    private String currnecy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,20 +83,43 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
         name.setAdapter(new GooglePlacesAutocompleteAdapter(this, android.R.layout.simple_list_item_1));
         name.setOnItemClickListener(this);
         currnecy.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, getCurrencyList()));
+
+        new GetPlaceDetails().execute("ChIJDw826jzcQUcRdiUBqV86zj0");
     }
 
     @Override
     public void onClick(View view) {
         if(view.getId() == add.getId()){
+            if (!validateInput())
+                return;
             Intent result = new Intent();
             result.putExtra("name", name.getText().toString());
             result.putExtra("from", from.getText().toString());
             result.putExtra("to", to.getText().toString());
-            result.putExtra("eCost", cost.getText().toString());
+            double costValue = 0;
+            if(!cost.getText().toString().equals(""))
+                costValue = Double.parseDouble(cost.getText().toString());
+            result.putExtra("eCost", costValue);
             result.putExtra("currency", currnecy.getText().toString());
             setResult(Activity.RESULT_OK, result);
             finish();
         }
+    }
+
+    private boolean validateInput() {
+        if(name.getText().length() == 0){
+            Toast.makeText(this, "Please enter city name", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (from.getText().length() == 0){
+            Toast.makeText(this, "Please enter start date", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        if (to.getText().length() == 0){
+            Toast.makeText(this, "please enter end date", Toast.LENGTH_SHORT).show();
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -158,9 +178,10 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
         StringBuilder jsonResults = new StringBuilder();
         try {
             StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_AUTOCOMPLETE + OUT_JSON);
-            sb.append("?key=" + GOOGLE_PLACE_API_KEY);
-            sb.append("&components=country:gr");
-            sb.append("&input=" + URLEncoder.encode(input, "utf8"));
+            sb.append("?input=" + URLEncoder.encode(input, "utf8"));
+            sb.append("&types=(cities)");
+            sb.append("&language=en_US");
+            sb.append("&key=" + GOOGLE_PLACE_API_KEY);
 
             URL url = new URL(sb.toString());
 
@@ -175,10 +196,10 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
                 jsonResults.append(buff, 0, read);
             }
         } catch (MalformedURLException e) {
-            Log.e(LOG_TAG, "Error processing Places API URL", e);
+//            Log.e(LOG_TAG, "Error processing Places API URL", e);
             return resultList;
         } catch (IOException e) {
-            Log.e(LOG_TAG, "Error connecting to Places API", e);
+//            Log.e(LOG_TAG, "Error connecting to Places API", e);
             return resultList;
         } finally {
             if (conn != null) {
@@ -195,12 +216,12 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
             // Extract the Place descriptions from the results
             resultList = new ArrayList<String>(predsJsonArray.length());
             for (int i = 0; i < predsJsonArray.length(); i++) {
-                System.out.println(predsJsonArray.getJSONObject(i).getString("description"));
-                System.out.println("============================================================");
+//                System.out.println(predsJsonArray.getJSONObject(i).getString("description"));
+//                System.out.println("============================================================");
                 resultList.add(predsJsonArray.getJSONObject(i).getString("description"));
             }
         } catch (JSONException e) {
-            Log.e(LOG_TAG, "Cannot process JSON results", e);
+//            Log.e(LOG_TAG, "Cannot process JSON results", e);
         }
 
         return resultList;
@@ -250,6 +271,60 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
                 }
             };
             return filter;
+        }
+    }
+
+    private class GetPlaceDetails extends AsyncTask<String, Void, Destination>{
+
+        private HttpURLConnection conn = null;
+        private StringBuilder jsonResults = new StringBuilder();
+
+        @Override
+        protected Destination doInBackground(String... strings) {
+            try {
+                StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_DETAILS + OUT_JSON);
+                sb.append("?placeid=" + URLEncoder.encode(strings[0], "utf8"));
+                sb.append("&key=" + GOOGLE_PLACE_API_KEY);
+
+                URL url = new URL(sb.toString());
+
+                System.out.println("URL: "+url);
+                conn = (HttpURLConnection) url.openConnection();
+                InputStreamReader in = new InputStreamReader(conn.getInputStream());
+
+                // Load the results into a StringBuilder
+                int read;
+                char[] buff = new char[1024];
+                while ((read = in.read(buff)) != -1) {
+                    jsonResults.append(buff, 0, read);
+                }
+                try {
+                    JSONObject jsonObject = new JSONObject(jsonResults.toString());
+                    JSONObject result = (JSONObject)  jsonObject.get("result");
+                    JSONObject geometry = (JSONObject) result.get("geometry");
+                    JSONObject location = (JSONObject) geometry.get("location");
+                    JSONObject northeast = (JSONObject)((JSONObject) geometry.get("viewport")).get("northeast");
+                    double lat1 = location.getDouble("lat");
+                    double lng1 = location.getDouble("lng");
+                    double lat2 = northeast.getDouble("lat");
+                    double lng2 = northeast.getDouble("lng");
+                    Log.d("Distance : ", "");
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e) {
+//            Log.e(LOG_TAG, "Error processing Places API URL", e);
+                return null;
+            } catch (IOException e) {
+//            Log.e(LOG_TAG, "Error connecting to Places API", e);
+                return null;
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            }
+            return null;
         }
     }
 }

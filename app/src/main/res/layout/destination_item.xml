@@ -8,7 +8,6 @@
 
     <TextView
         android:text="Destination"
-        android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:id="@+id/destination"
         android:layout_weight="1"
@@ -16,17 +15,38 @@
         android:textAlignment="textStart"
         android:gravity="center_vertical"
         android:textStyle="normal|bold"
-        android:paddingLeft="10dp" />
+        android:paddingLeft="10dp"
+        android:layout_width="0dp" />
 
-    <TextView
-        android:text="Cost"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:id="@+id/cost"
-        android:layout_weight="0.2"
-        android:gravity="center_vertical|end"
-        android:textAlignment="center"
-        android:textAllCaps="false"
-        android:textStyle="normal|bold" />
+        android:layout_weight="0.4">
+
+        <TextView
+            android:text=""
+            android:layout_height="match_parent"
+            android:id="@+id/cost"
+            android:layout_weight="1"
+            android:gravity="center_vertical|end"
+            android:textAlignment="textEnd"
+            android:textAllCaps="false"
+            android:textStyle="normal|bold"
+            android:layout_width="0dp"
+            android:textSize="14sp"
+            android:textColor="@android:color/darker_gray" />
+
+        <TextView
+            android:text=""
+            android:layout_width="0dp"
+            android:paddingLeft="3dp"
+            android:layout_height="match_parent"
+            android:textAlignment="textStart"
+            android:textStyle="normal|bold"
+            android:gravity="center_vertical|end"
+            android:id="@+id/currency"
+            android:layout_weight="1" />
+    </LinearLayout>
 
 </LinearLayout>

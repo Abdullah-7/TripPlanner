@@ -42,8 +42,15 @@ public class DestinationAdapter extends ArrayAdapter<Destination> {
             TextView name = (TextView) view.findViewById(R.id.destination);
             name.setText(getItem(position).getName());
 
-            TextView cost = (TextView) view.findViewById(R.id.cost);
-            cost.setText(getItem(position).getCost() + getItem(position).getCurrency());
+//            Log.d("Cost: ", "Value: " +getItem(position).getCost()+"");
+//            Log.d("Currency: ", "Value: " +getItem(position).getCurrency().toString());
+//            Log.d("Compare", Double.compare(0, getItem(position).getCost()) + " " + !getItem(position).getCurrency().equals(""));
+            if(Double.compare(0, getItem(position).getCost()) != 0 && !getItem(position).getCurrency().equals("")) {
+                TextView cost = (TextView) view.findViewById(R.id.cost);
+                cost.setText(getItem(position).getCost()+"");
+                TextView currency = (TextView) view.findViewById(R.id.currency);
+                currency.setText(getItem(position).getCurrency().substring(0, 3));
+            }
         }
         return view;
     }
