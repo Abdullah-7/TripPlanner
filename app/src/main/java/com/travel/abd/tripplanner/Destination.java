@@ -1,5 +1,7 @@
 package com.travel.abd.tripplanner;
 
+import android.location.Location;
+
 import java.util.Date;
 
 /**
@@ -9,10 +11,15 @@ import java.util.Date;
 public class Destination {
 
     private int id;
+    private String placeId;
     private String name;
+    private String country;
+    private Location location;
+    private String countryCode;
     private Date from;
     private Date to;
     private Date [] days;
+    private double budget;
     private double cost;
     private String currency;
 
@@ -70,5 +77,45 @@ public class Destination {
 
     public String getCurrency() {
         return currency;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public Location getLocation() {
+        return location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
+    }
+
+    public String getCountryCode() {
+        return countryCode;
+    }
+
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
+    }
+
+    public double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(double budget) {
+        this.budget = budget;
     }
 }

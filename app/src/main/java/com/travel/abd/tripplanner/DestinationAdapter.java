@@ -40,7 +40,7 @@ public class DestinationAdapter extends ArrayAdapter<Destination> {
         Log.v("Destination", getItem(position).getName() + position);
         if(view != null) {
             TextView name = (TextView) view.findViewById(R.id.destination);
-            name.setText(getItem(position).getName());
+            name.setText(getItem(position).getName() + ", " + getItem(position).getCountry());
 
 //            Log.d("Cost: ", "Value: " +getItem(position).getCost()+"");
 //            Log.d("Currency: ", "Value: " +getItem(position).getCurrency().toString());

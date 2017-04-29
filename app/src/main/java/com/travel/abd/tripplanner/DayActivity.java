@@ -2,7 +2,7 @@ package com.travel.abd.tripplanner;
 
 import android.app.FragmentTransaction;
 import android.content.Intent;
-import android.databinding.DataBindingUtil;
+import android.database.DataSetObserver;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
@@ -12,10 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.travel.abd.tripplanner.databinding.DayItemBinding;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class DayActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener {
+public class DayActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener{
 
     private ViewPager viewPager;
     private ViewPagerAdaper viewPagerAdaper;
@@ -39,10 +39,7 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DayItemBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_day);
-        Task ta = new Task();
-        ta.setName("Test");
-        binding.setTask(Task);
+        setContentView(R.layout.activity_day);
 
         initViews();
     }
@@ -87,6 +84,12 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         viewPager.setAdapter(viewPagerAdaper);
         viewPager.setOnPageChangeListener(this);
         viewPagerAdaper.notifyDataSetChanged();
+        viewPagerAdaper.registerDataSetObserver(new DataSetObserver() {
+            @Override
+            public void onChanged() {
+                //setTotal(viewPager.getCurrentItem());
+            }
+        });
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(this);
