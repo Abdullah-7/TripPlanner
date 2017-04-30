@@ -126,8 +126,7 @@ public class AddDestinationActivity extends AppCompatActivity implements DatePic
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         String str = (String) adapterView.getItemAtPosition(i);
-        ((TextView)view).setText("");
-        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
+//        Toast.makeText(this, str, Toast.LENGTH_SHORT).show();
     }
 
     @Override

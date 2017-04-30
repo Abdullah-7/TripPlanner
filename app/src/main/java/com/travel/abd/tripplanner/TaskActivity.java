@@ -3,14 +3,17 @@ package com.travel.abd.tripplanner;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private TextView name;
-    private TextView time;
-    private TextView cost;
+    private EditText name;
+    private EditText time;
+    private EditText cost;
+    private EditText budget;
 
+    private Task task;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,14 +24,23 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void initViews() {
+
+        getIntentData();
+
+        name = (EditText) findViewById(R.id.name);
+        time = (EditText) findViewById(R.id.time);
+        cost = (EditText) findViewById(R.id.cost);
+        budget = (EditText) findViewById(R.id.budget);
+
+        name.setText(task.getName());
+        time.setText(task.getTime());
+        cost.setText(String.valueOf(task.getPrice()));
+        budget.setText(String.valueOf(task.getBudget()));
+    }
+
+
+    public void getIntentData() {
         Intent intent = getIntent();
-
-        name = (TextView) findViewById(R.id.name);
-        time = (TextView) findViewById(R.id.time);
-        cost = (TextView) findViewById(R.id.cost);
-
-        name.setText(intent.getStringExtra("name"));
-        time.setText(intent.getStringExtra("time"));
-        cost.setText(intent.getStringExtra("cost"));
+        task = intent.getParcelableExtra("task");
     }
 }

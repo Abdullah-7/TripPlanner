@@ -25,7 +25,7 @@ import java.util.List;
  * Created by albargi on 4/25/2017.
  */
 
-public class ViewPagerAdaper extends PagerAdapter implements AdapterView.OnItemClickListener {
+public class ViewPagerAdaper extends PagerAdapter {
 
     private ArrayList<Day> items;
     private ArrayList<Task> tasks;
@@ -73,15 +73,8 @@ public class ViewPagerAdaper extends PagerAdapter implements AdapterView.OnItemC
             }
         });
         listView.setAdapter(adapter);
-        listView.setOnItemClickListener(this);
         container.addView(listView);
         return listView;
-    }
-
-    @Override
-    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        Intent intent = new Intent(context, TaskActivity.class);
-        context.startActivity(intent);
     }
 
     private class ListViewAdapter extends ArrayAdapter<Task>{
@@ -106,6 +99,14 @@ public class ViewPagerAdaper extends PagerAdapter implements AdapterView.OnItemC
             if(view != null){
                 TextView name = (TextView) view.findViewById(R.id.name);
                 name.setText(getItem(position).getName());
+                name.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent intent = new Intent(context, TaskActivity.class);
+                        intent.putExtra("task", getItem(position));
+                        context.startActivity(intent);
+                    }
+                });
                 TextView price = (TextView) view.findViewById(R.id.price);
                 price.setText(getItem(position).getPrice()+"");
 

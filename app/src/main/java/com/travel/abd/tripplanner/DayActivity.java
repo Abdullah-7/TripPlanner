@@ -3,6 +3,8 @@ package com.travel.abd.tripplanner;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.database.DataSetObserver;
+import android.location.Location;
+import android.os.AsyncTask;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTitleStrip;
@@ -17,6 +19,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -25,10 +37,19 @@ import java.util.Date;
 
 public class DayActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener{
 
+    private static final String LOG_TAG = "Google Places Autocomplete";
+    private static final String PLACES_API_BASE = "https://maps.googleapis.com/maps/api/place";
+    private static final String TYPE_DETAILS = "/details";
+    private static final String TYPE_AUTOCOMPLETE = "/autocomplete";
+    private static final String OUT_JSON = "/json";
+    private static final String GOOGLE_PLACE_API_KEY = "AIzaSyBIgDpTIPVnzY-unDB3_axxMGLPS4Hl8js";
+
     private ViewPager viewPager;
     private ViewPagerAdaper viewPagerAdaper;
     private FloatingActionButton fab;
     private TextView total;
+
+    private Intent resultData;
 
     private ArrayList<Day> days;
 
@@ -46,22 +67,29 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
 
     private void initViews() {
         //Test Only
+        Location location = new Location("");
+        location.setLatitude(0);
+        location.setLongitude(0);
         Task t = new Task();
         t.setName("A1");
         t.setPrice(10);
+        t.setLocation(location);
         tasks1.add(t);
         t = new Task();
         t.setName("A2");
         t.setPrice(15);
+        t.setLocation(location);
         tasks1.add(t);
 
         Task t2 = new Task();
         t2.setName("B1");
         t2.setPrice(7);
+        t2.setLocation(location);
         tasks2.add(t2);
         t2 = new Task();
         t2.setName("B2");
         t2.setPrice(9);
+        t2.setLocation(location);
         tasks2.add(t2);
         // end of test
 
@@ -146,6 +174,7 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         if(view.getId() == fab.getId()){
             Intent intent = new Intent(this, AddTask.class);
             intent.putExtra("city", getIntent().getStringExtra("city"));
+            intent.putExtra("country", getIntent().getStringExtra("country"));
             startActivityForResult(intent, 1);
         }
     }
@@ -154,16 +183,17 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if(requestCode == 1){
             if(resultCode == RESULT_OK){
-                Task task = new Task();
-                task.setName(data.getStringExtra("name"));
-                task.setPrice(data.getDoubleExtra("price", 0));
-//                Toast.makeText(this, task.getPrice()+"", Toast.LENGTH_SHORT).show();
-                Day day = days.get(viewPager.getCurrentItem());
-                ArrayList<Task> tasks = day.getTasks();
-                tasks.add(task);
-                day.setTasks(tasks);
-                days.set(viewPager.getCurrentItem(), day);
-                viewPagerAdaper.notifyDataSetChanged();
+                resultData = data;
+//                Task task = new Task();
+//                task.setName(data.getStringExtra("name"));
+//                task.setPrice(data.getDoubleExtra("price", 0));
+////                Toast.makeText(this, task.getPrice()+"", Toast.LENGTH_SHORT).show();
+//                Day day = days.get(viewPager.getCurrentItem());
+//                ArrayList<Task> tasks = day.getTasks();
+//                tasks.add(task);
+//                day.setTasks(tasks);
+
+                new GetPlaceDetails().execute(data.getStringExtra("placeId"));
             }
         }
     }
@@ -204,4 +234,91 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
 
         }
     };
+
+    private class GetPlaceDetails extends AsyncTask<String, Void, Destination> {
+
+        private HttpURLConnection conn = null;
+        private StringBuilder jsonResults = new StringBuilder();
+
+        @Override
+        protected Destination doInBackground(String... strings) {
+            try {
+                StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_DETAILS + OUT_JSON);
+                sb.append("?placeid=" + URLEncoder.encode(strings[0], "utf8"));
+                sb.append("&key=" + GOOGLE_PLACE_API_KEY);
+
+                URL url = new URL(sb.toString());
+
+                System.out.println("URL: "+url);
+                conn = (HttpURLConnection) url.openConnection();
+                InputStreamReader in = new InputStreamReader(conn.getInputStream());
+
+                // Load the results into a StringBuilder
+                int read;
+                char[] buff = new char[1024];
+                while ((read = in.read(buff)) != -1) {
+                    jsonResults.append(buff, 0, read);
+                }
+                try {
+                    final JSONObject jsonObject = new JSONObject(jsonResults.toString());
+                    JSONObject result = (JSONObject)  jsonObject.get("result");
+                    JSONArray address = result.getJSONArray("address_components");
+                    String name = result.get("name").toString();
+                    String phoneNumber = result.get("international_phone_number").toString();
+                    String placeId = result.get("place_id").toString();
+                    String website = result.get("website").toString();
+                    JSONObject geometry = (JSONObject) result.get("geometry");
+                    JSONObject location = (JSONObject) geometry.get("location");
+                    JSONObject northeast = (JSONObject)((JSONObject) geometry.get("viewport")).get("northeast");
+                    double lat1 = location.getDouble("lat");
+                    double lng1 = location.getDouble("lng");
+                    double lat2 = northeast.getDouble("lat");
+                    double lng2 = northeast.getDouble("lng");
+
+                    Location location1 = new Location("");
+                    location1.setLatitude(lat1);
+                    location1.setLongitude(lng1);
+
+                    //
+                    final Task task = new Task();
+                    task.setPlaceId(placeId);
+                    task.setName(name);
+                    task.setTime(resultData.getStringExtra("time"));
+                    task.setWebsite(website);
+                    task.setPhoneNumber(phoneNumber);
+                    task.setPrice(resultData.getDoubleExtra("price", 0));
+                    task.setBudget(resultData.getDoubleExtra("budget", 0));
+                    task.setLocation(location1);
+                    Log.d("Task", task.toString());
+
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            Day day = days.get(viewPager.getCurrentItem());
+                            ArrayList<Task> tasks = day.getTasks();
+                            tasks.add(task);
+                            day.setTasks(tasks);
+                            days.set(viewPager.getCurrentItem(), day);
+                            viewPagerAdaper.notifyDataSetChanged();
+                        }
+                    });
+
+                }
+                catch (JSONException e){
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e) {
+//            Log.e(LOG_TAG, "Error processing Places API URL", e);
+                return null;
+            } catch (IOException e) {
+//            Log.e(LOG_TAG, "Error connecting to Places API", e);
+                return null;
+            } finally {
+                if (conn != null) {
+                    conn.disconnect();
+                }
+            }
+            return null;
+        }
+    }
 }

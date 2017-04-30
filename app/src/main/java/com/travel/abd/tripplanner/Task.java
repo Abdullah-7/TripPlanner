@@ -1,18 +1,70 @@
 package com.travel.abd.tripplanner;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import java.util.Date;
 
 /**
  * Created by albargi on 4/25/2017.
  */
 
-public class Task {
+public class Task implements Parcelable{
 
     private long id;
+    private String placeId;
     private String name;
+    private String time;
+    private String phoneNumber;
+    private String website;
+    private double budget;
     private double price;
     private boolean isVisited;
     private Location location;
+
+    public Task(){
+
+    }
+
+    public Task(Parcel in){
+        placeId = in.readString();
+        name = in.readString();
+        time = in.readString();
+        phoneNumber = in.readString();
+        website = in.readString();
+        budget = in.readDouble();
+        price = in.readDouble();
+        isVisited = (in.readInt() == 1 ? true : false);
+        location = Location.CREATOR.createFromParcel(in);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(placeId);
+        parcel.writeString(name);
+        parcel.writeString(time);
+        parcel.writeDouble(budget);
+        parcel.writeDouble(price);
+        parcel.writeInt((isVisited == true ? 1 : 0));
+        location.writeToParcel(parcel, i);
+    }
+
+    public static final Parcelable.Creator<Task> CREATOR =
+            new Parcelable.Creator<Task>() {
+                public Task createFromParcel(Parcel in) {
+                    return new Task(in);
+                }
+
+                public Task[] newArray(int size) {
+                    return new Task[size];
+                }
+            };
 
     public long getId() {
         return id;
@@ -52,5 +104,57 @@ public class Task {
 
     public void setLocation(Location location) {
         this.location = location;
+    }
+
+    public String getPlaceId() {
+        return placeId;
+    }
+
+    public void setPlaceId(String placeId) {
+        this.placeId = placeId;
+    }
+
+    public double getBudget() {
+        return budget;
+    }
+
+    public void setBudget(double budget) {
+        this.budget = budget;
+    }
+
+    public String getTime() {
+        return time;
+    }
+
+    public void setTime(String time) {
+        this.time = time;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getWebsite() {
+        return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
+    }
+
+    public String toString(){
+        return placeId + "\n" +
+                name + "\n" +
+                time + "\n" +
+                phoneNumber + "\n" +
+                website + "\n" +
+                budget + "\n" +
+                price + "\n" +
+                isVisited + "\n" +
+                location.toString();
     }
 }

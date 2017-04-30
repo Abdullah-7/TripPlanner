@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         Calendar calendar = Calendar.getInstance();
         Destination d = new Destination();
         d.setName("Budapest");
+        d.setCountry("Hungary");
         d.setFrom(calendar.getTime());
         calendar.add(calendar.DATE, 10);
         d.setTo(calendar.getTime());
@@ -137,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         Intent intent = new Intent(this, DayActivity.class);
         intent.putExtra("city", destination.getName());
+        intent.putExtra("country", destination.getCountry());
         intent.putParcelableArrayListExtra("days", days);
         startActivity(intent);
     }
