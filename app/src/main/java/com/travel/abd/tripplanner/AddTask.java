@@ -46,6 +46,8 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
     private EditText price;
     private Button add;
 
+    private static Destination destination;
+
     private JSONArray countriesCodes;
 
     private static JSONArray predsJsonArray;
@@ -99,6 +101,7 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
     private void getIntentData(){
         Intent intent = getIntent();
 
+        destination = intent.getParcelableExtra("destination");
         cityname = intent.getStringExtra("city");
         countryname = intent.getStringExtra("country");
     }
@@ -162,7 +165,7 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
         StringBuilder jsonResults = new StringBuilder();
         try {
             StringBuilder sb = new StringBuilder(PLACES_API_BASE + TYPE_AUTOCOMPLETE + OUT_JSON);
-            sb.append("?input=" + URLEncoder.encode(input, "utf8") + cityname);
+            sb.append("?input=" + URLEncoder.encode(input, "utf8") + destination.getName());
 //            sb.append("&types=(cities)");
 //            sb.append("&components=country:hu");
             if(countryCode != null)

@@ -51,6 +51,7 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
 
     private Intent resultData;
 
+    private Destination destination;
     private ArrayList<Day> days;
 
     // Test only
@@ -66,32 +67,8 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
     }
 
     private void initViews() {
-        //Test Only
-        Location location = new Location("");
-        location.setLatitude(0);
-        location.setLongitude(0);
-        Task t = new Task();
-        t.setName("A1");
-        t.setPrice(10);
-        t.setLocation(location);
-        tasks1.add(t);
-        t = new Task();
-        t.setName("A2");
-        t.setPrice(15);
-        t.setLocation(location);
-        tasks1.add(t);
 
-        Task t2 = new Task();
-        t2.setName("B1");
-        t2.setPrice(7);
-        t2.setLocation(location);
-        tasks2.add(t2);
-        t2 = new Task();
-        t2.setName("B2");
-        t2.setPrice(9);
-        t2.setLocation(location);
-        tasks2.add(t2);
-        // end of test
+        getIntentData();
 
         final ActionBar actionBar = getSupportActionBar();
 
@@ -158,6 +135,12 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         setTotal(index);
     }
 
+    private void getIntentData(){
+        Intent intent = getIntent();
+        destination = intent.getParcelableExtra("destination");
+        Log.d("destination", destination.getName());
+    }
+
     private void setTotal(int dayIndex){
         double totalValue = 0;
         Day day = days.get(dayIndex);
@@ -175,6 +158,7 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
             Intent intent = new Intent(this, AddTask.class);
             intent.putExtra("city", getIntent().getStringExtra("city"));
             intent.putExtra("country", getIntent().getStringExtra("country"));
+            intent.putExtra("destination", destination);
             startActivityForResult(intent, 1);
         }
     }

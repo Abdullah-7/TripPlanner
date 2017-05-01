@@ -3,6 +3,8 @@ package com.travel.abd.tripplanner;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.orm.SugarRecord;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -10,7 +12,7 @@ import java.util.Date;
  * Created by albargi on 4/24/2017.
  */
 
-public class Day implements Parcelable {
+public class Day extends SugarRecord implements Parcelable {
 
     private long id;
     private Date date;
@@ -24,14 +26,6 @@ public class Day implements Parcelable {
 
     public Day(Parcel in){
         date = new Date(in.readLong());
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Date getDate() {
@@ -70,4 +64,8 @@ public class Day implements Parcelable {
                     return new Day[size];
                 }
             };
+
+    public String toString(){
+        return "\n\t\tDate: " + date.toString();
+    }
 }

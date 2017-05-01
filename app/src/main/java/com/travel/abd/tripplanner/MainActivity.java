@@ -17,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.orm.SugarContext;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +47,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private DestinationAdapter destinationAdapter;
 
     private Destination destinationAdd;
+    private Destination destination;
 
     //Test Only
     List<Destination> list = new ArrayList<>();
@@ -74,16 +77,32 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private void initViews() {
 
         //Test
-        Calendar calendar = Calendar.getInstance();
-        Destination d = new Destination();
-        d.setName("Budapest");
-        d.setCountry("Hungary");
-        d.setFrom(calendar.getTime());
-        calendar.add(calendar.DATE, 10);
-        d.setTo(calendar.getTime());
-        d.setCost(155);
-        d.setCurrency("USD");
-        list.add(d);
+//        Calendar calendar = Calendar.getInstance();
+//        Destination d = new Destination();
+//        d.setName("Budapest");
+//        d.setCountry("Hungary");
+//        d.setFrom(calendar.getTime());
+//        ArrayList<Day> array = new ArrayList<Day>();
+//        Day da = new Day();
+//        da.setDate(calendar.getTime());
+//        array.add(da);
+//        calendar.add(calendar.DATE, 10);
+//        da = new Day();
+//        da.setDate(calendar.getTime());
+//        array.add(da);
+//        d.setTo(calendar.getTime());
+//        d.setCost(155);
+//        d.setCurrency("USD");
+//        Location l = new Location("");
+//        l.setLatitude(0);
+//        l.setLongitude(0);
+//        d.setLocation(l);
+//        d.setDays(array);
+//        d.save();
+//
+        Destination.deleteAll(Destination.class);
+        list.addAll(Destination.listAll(Destination.class));
+//        list.add(d);
         //end of test
 
         // List View
@@ -113,7 +132,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         ArrayList<Day> days = new ArrayList<Day>();
-        Destination destination = (Destination) destinationAdapter.getItem(i);
+        destination = (Destination) destinationAdapter.getItem(i);
 
         Date startDate = destination.getFrom();
         Date endDate = destination.getTo();
@@ -135,11 +154,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         for (Day d : days) {
 //            Log.d("Day", d.getDate().toString() + " - " + d.getDate().before(endDate));
         }
-
+//        destination.setDays(days);
         Intent intent = new Intent(this, DayActivity.class);
         intent.putExtra("city", destination.getName());
         intent.putExtra("country", destination.getCountry());
         intent.putParcelableArrayListExtra("days", days);
+        Log.d("destination", destination.toString());
+        intent.putExtra("destination", destination);
         startActivity(intent);
     }
 
@@ -190,11 +211,12 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     destinationAdd.setName(city);
                     destinationAdd.setCountry(country);
                     destinationAdd.setLocation(location1);
+                    destinationAdd.save();
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            list.add(destinationAdd);
+                            list.add(Destination.findById(Destination.class, destinationAdd.getId()));
                             destinationAdapter.notifyDataSetChanged();
                         }
                     });

@@ -1,27 +1,81 @@
 package com.travel.abd.tripplanner;
 
 import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
+import android.util.Log;
 
+import com.orm.SugarRecord;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 
 /**
  * Created by albargi on 4/20/2017.
  */
 
-public class Destination {
+public class Destination extends SugarRecord implements Parcelable {
 
     private int id;
-    private String placeId;
+    private String placeId = "";
     private String name;
     private String country;
     private Location location;
-    private String countryCode;
-    private Date from;
-    private Date to;
-    private Date [] days;
+    private String countryCode = "";
+    private Date fromDate;
+    private Date toDate;
+//    private ArrayList<Day> days = new ArrayList<Day>();
     private double budget;
     private double cost;
-    private String currency;
+    private String currency = "";
+
+    public Destination(){}
+
+    public Destination(Parcel in){
+        placeId = in.readString();
+        name = in.readString();
+        country = in.readString();
+        location = Location.CREATOR.createFromParcel(in);
+        countryCode = in.readString();
+        fromDate = new Date(in.readLong());
+        toDate = new Date(in.readLong());
+//        in.readTypedList(days, Day.CREATOR);
+        budget = in.readDouble();
+        cost = in.readDouble();
+        currency = in.readString();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(placeId);
+        parcel.writeString(name);
+        parcel.writeString(country);
+        location.writeToParcel(parcel, i);
+        parcel.writeString(countryCode);
+        parcel.writeLong(fromDate.getTime());
+        parcel.writeLong(toDate.getTime());
+//        parcel.writeTypedList(days);
+        parcel.writeDouble(budget);
+        parcel.writeDouble(cost);
+        parcel.writeString(currency);
+    }
+
+    public static final Parcelable.Creator<Destination> CREATOR =
+            new Parcelable.Creator<Destination>() {
+                public Destination createFromParcel(Parcel in) {
+                    return new Destination(in);
+                }
+
+                public Destination[] newArray(int size) {
+                    return new Destination[size];
+                }
+            };
 
     public String getName() {
         return name;
@@ -31,37 +85,29 @@ public class Destination {
         this.name = name;
     }
 
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
     public Date getFrom() {
-        return from;
+        return fromDate;
     }
 
     public void setFrom(Date from) {
-        this.from = from;
+        this.fromDate = from;
     }
 
     public Date getTo() {
-        return to;
+        return toDate;
     }
 
     public void setTo(Date to) {
-        this.to = to;
+        this.toDate = to;
     }
 
-    public Date[] getDays() {
-        return days;
-    }
-
-    public void setDays(Date[] days) {
-        this.days = days;
-    }
+//    public ArrayList<Day> getDays() {
+//        return days;
+//    }
+//
+//    public void setDays(ArrayList<Day> days) {
+//        this.days = days;
+//    }
 
     public void setCost(double cost) {
         this.cost = cost;
@@ -117,5 +163,19 @@ public class Destination {
 
     public void setBudget(double budget) {
         this.budget = budget;
+    }
+
+    public String toString(){
+        return  "Place ID: " + placeId +
+                "\nName: " + name +
+                "\nCountry: " + country +
+                "\nCountry Code: " + countryCode +
+                "\nFrom: " + fromDate +
+                "\nTo: " + toDate +
+                "\nCurrency: " + currency +
+                "\nCost: " + cost +
+                "\nBudget: " + budget +
+//                "\nDays: " + android.text.TextUtils.join(",", days) +
+                "\nLocation: " +location.toString();
     }
 }

@@ -16,6 +16,9 @@ public class Task implements Parcelable{
     private String placeId;
     private String name;
     private String time;
+    private String city;
+    private String country;
+    private String currency;
     private String phoneNumber;
     private String website;
     private double budget;
@@ -31,6 +34,9 @@ public class Task implements Parcelable{
         placeId = in.readString();
         name = in.readString();
         time = in.readString();
+        city = in.readString();
+        country = in.readString();
+        currency = in.readString();
         phoneNumber = in.readString();
         website = in.readString();
         budget = in.readDouble();
@@ -49,6 +55,11 @@ public class Task implements Parcelable{
         parcel.writeString(placeId);
         parcel.writeString(name);
         parcel.writeString(time);
+        parcel.writeString(city);
+        parcel.writeString(country);
+        parcel.writeString(currency);
+        parcel.writeString(phoneNumber);
+        parcel.writeString(website);
         parcel.writeDouble(budget);
         parcel.writeDouble(price);
         parcel.writeInt((isVisited == true ? 1 : 0));
@@ -144,6 +155,30 @@ public class Task implements Parcelable{
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public void setCountry(String country) {
+        this.country = country;
+    }
+
+    public String getCurrency() {
+        return currency;
+    }
+
+    public void setCurrency(String currency) {
+        this.currency = currency;
     }
 
     public String toString(){
