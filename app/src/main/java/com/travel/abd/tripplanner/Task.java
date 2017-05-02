@@ -4,27 +4,32 @@ import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.orm.SugarRecord;
+
 import java.util.Date;
 
 /**
  * Created by albargi on 4/25/2017.
  */
 
-public class Task implements Parcelable{
+public class Task extends SugarRecord implements Parcelable{
 
     private long id;
+    private long dayId;
     private String placeId;
     private String name;
     private String time;
     private String city;
     private String country;
     private String currency;
-    private String phoneNumber;
-    private String website;
+    private String phoneNumber = null;
+    private String website = null;
+    private String address;
     private double budget;
     private double price;
     private boolean isVisited;
-    private Location location;
+    private double lat;
+    private double lng;
 
     public Task(){
 
@@ -42,7 +47,6 @@ public class Task implements Parcelable{
         budget = in.readDouble();
         price = in.readDouble();
         isVisited = (in.readInt() == 1 ? true : false);
-        location = Location.CREATOR.createFromParcel(in);
     }
 
     @Override
@@ -63,7 +67,6 @@ public class Task implements Parcelable{
         parcel.writeDouble(budget);
         parcel.writeDouble(price);
         parcel.writeInt((isVisited == true ? 1 : 0));
-        location.writeToParcel(parcel, i);
     }
 
     public static final Parcelable.Creator<Task> CREATOR =
@@ -77,12 +80,13 @@ public class Task implements Parcelable{
                 }
             };
 
-    public long getId() {
-        return id;
+
+    public long getDayId() {
+        return dayId;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setDayId(long dayId) {
+        this.dayId = dayId;
     }
 
     public String getName() {
@@ -109,12 +113,20 @@ public class Task implements Parcelable{
         isVisited = visited;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLat() {
+        return lat;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public double getLng() {
+        return lng;
+    }
+
+    public void setLng(double lng) {
+        this.lng = lng;
     }
 
     public String getPlaceId() {
@@ -181,15 +193,25 @@ public class Task implements Parcelable{
         this.currency = currency;
     }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
     public String toString(){
-        return placeId + "\n" +
+        return  id + "\n" +
+                dayId + "\n" +
+                placeId + "\n" +
                 name + "\n" +
                 time + "\n" +
                 phoneNumber + "\n" +
                 website + "\n" +
                 budget + "\n" +
                 price + "\n" +
-                isVisited + "\n" +
-                location.toString();
+                isVisited + "\n";
+//                location.toString();
     }
 }

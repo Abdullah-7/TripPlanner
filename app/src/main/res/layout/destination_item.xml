@@ -22,20 +22,20 @@
         android:orientation="horizontal"
         android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="0.4">
+        android:layout_weight="0.5">
 
         <TextView
-            android:text=""
-            android:layout_height="match_parent"
             android:id="@+id/cost"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical|end"
+            android:text=""
             android:textAlignment="textEnd"
             android:textAllCaps="false"
-            android:textStyle="normal|bold"
-            android:layout_width="0dp"
+            android:textColor="@android:color/darker_gray"
             android:textSize="14sp"
-            android:textColor="@android:color/darker_gray" />
+            android:textStyle="normal|bold" />
 
         <TextView
             android:text=""
@@ -47,6 +47,13 @@
             android:gravity="center_vertical|end"
             android:id="@+id/currency"
             android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/delete"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:src="@android:drawable/ic_delete" />
     </LinearLayout>
 
 </LinearLayout>

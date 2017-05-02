@@ -19,18 +19,16 @@
             android:layout_weight="1">
 
             <TextView
-                android:text="TextView"
+                android:id="@+id/time"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/time"
                 android:layout_weight="1"
                 android:gravity="center_vertical" />
 
             <TextView
-                android:text="TextView"
+                android:id="@+id/price"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
-                android:id="@+id/price"
                 android:layout_weight="1"
                 android:gravity="center_vertical" />
 

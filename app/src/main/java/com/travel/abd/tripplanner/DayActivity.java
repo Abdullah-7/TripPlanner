@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class DayActivity extends AppCompatActivity implements ViewPager.OnPageChangeListener, View.OnClickListener{
 
@@ -53,6 +54,8 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
 
     private Destination destination;
     private ArrayList<Day> days;
+
+    private long destinationId;
 
     // Test only
     private ArrayList<Task> tasks1 = new ArrayList<Task>();
@@ -75,14 +78,14 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         // Specify that tabs should be displayed in the action bar.
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 
-        Intent intent = getIntent();
-        days = intent.getParcelableArrayListExtra("days");
-        Day d = days.get(0);
-        d.setTasks(tasks1);
-        days.set(0, d);
-        d = days.get(1);
-        d.setTasks(tasks2);
-        days.set(1, d);
+//        Intent intent = getIntent();
+//        days = intent.getParcelableArrayListExtra("days");
+//        Day d = days.get(0);
+//        d.setTasks(tasks1);
+//        days.set(0, d);
+//        d = days.get(1);
+//        d.setTasks(tasks2);
+//        days.set(1, d);
 //        Toast.makeText(this, days.size()+"", Toast.LENGTH_SHORT).show();
         viewPager = (ViewPager) findViewById(R.id.viewPager);
         viewPagerAdaper = new ViewPagerAdaper(this, days, tasks1);
@@ -92,7 +95,9 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         viewPagerAdaper.registerDataSetObserver(new DataSetObserver() {
             @Override
             public void onChanged() {
-                //setTotal(viewPager.getCurrentItem());
+                int dayIndex = viewPager.getCurrentItem();
+                setTotal(dayIndex);
+
             }
         });
 
@@ -135,16 +140,49 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
         setTotal(index);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        Toast.makeText(this, "" + destination.getName(), Toast.LENGTH_SHORT).show();
+//        days = (ArrayList<Day>) Day.find(Day.class, "destination_Id = ?", String.valueOf(destinationId));
+//        if(days.size() > 0){
+//            for (Day day: days) {
+////                Log.d("dayId", day.getId() + "");
+//                day.setTasks((ArrayList<Task>)Task.find(Task.class, "day_Id = ?", String.valueOf(day.getId())));
+//                days.set(days.indexOf(day), day);
+//            }
+//        }
+//        if(viewPagerAdaper != null)
+//            viewPagerAdaper.notifyAdapter(viewPager.getCurrentItem());
+    }
+
     private void getIntentData(){
+//        Task.deleteAll(Task.class);
         Intent intent = getIntent();
-        destination = intent.getParcelableExtra("destination");
+        destinationId = intent.getLongExtra("destination", 0);
+        destination = Destination.findById(Destination.class, destinationId);
+        setTitle(destination.getName());
+        days = (ArrayList<Day>) Day.find(Day.class, "destination_Id = ?", String.valueOf(destinationId));
+        if(days.size() > 0){
+            for (Day day: days) {
+//                Log.d("dayId", day.getId() + "");
+                day.setTasks((ArrayList<Task>)Task.find(Task.class, "day_Id = ?", String.valueOf(day.getId())));
+                days.set(days.indexOf(day), day);
+            }
+        }
+
         Log.d("destination", destination.getName());
+
+//        List<Task> tasks = Task.listAll(Task.class);
+//        for (Task t: tasks) {
+//            Log.d("Task", t.toString());
+//        }
     }
 
     private void setTotal(int dayIndex){
         double totalValue = 0;
         Day day = days.get(dayIndex);
-        ArrayList<Task> tasks = day.getTasks();
+        List<Task> tasks = Task.find(Task.class, "day_Id = ?", String.valueOf(day.getId()));
         for (Task t: tasks) {
             if(t.isVisited())
                 totalValue += t.getPrice();
@@ -156,9 +194,7 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
     public void onClick(View view) {
         if(view.getId() == fab.getId()){
             Intent intent = new Intent(this, AddTask.class);
-            intent.putExtra("city", getIntent().getStringExtra("city"));
-            intent.putExtra("country", getIntent().getStringExtra("country"));
-            intent.putExtra("destination", destination);
+            intent.putExtra("destination", destinationId);
             startActivityForResult(intent, 1);
         }
     }
@@ -248,9 +284,14 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
                     JSONObject result = (JSONObject)  jsonObject.get("result");
                     JSONArray address = result.getJSONArray("address_components");
                     String name = result.get("name").toString();
-                    String phoneNumber = result.get("international_phone_number").toString();
+                    String phoneNumber = null;
+                    if(result.has("international_phone_number"))
+                        phoneNumber = result.get("international_phone_number").toString();
                     String placeId = result.get("place_id").toString();
-                    String website = result.get("website").toString();
+                    String website = null;
+                    if(result.has("website"))
+                        website = result.get("website").toString();
+                    String formattedAddress = result.get("formatted_address").toString();
                     JSONObject geometry = (JSONObject) result.get("geometry");
                     JSONObject location = (JSONObject) geometry.get("location");
                     JSONObject northeast = (JSONObject)((JSONObject) geometry.get("viewport")).get("northeast");
@@ -267,20 +308,26 @@ public class DayActivity extends AppCompatActivity implements ViewPager.OnPageCh
                     final Task task = new Task();
                     task.setPlaceId(placeId);
                     task.setName(name);
+                    task.setCity(destination.getName());
+                    task.setCountry(destination.getCountry());
                     task.setTime(resultData.getStringExtra("time"));
                     task.setWebsite(website);
                     task.setPhoneNumber(phoneNumber);
                     task.setPrice(resultData.getDoubleExtra("price", 0));
                     task.setBudget(resultData.getDoubleExtra("budget", 0));
-                    task.setLocation(location1);
+                    task.setLat(lat1);
+                    task.setLng(lng1);
+                    task.setAddress(formattedAddress);
                     Log.d("Task", task.toString());
 
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             Day day = days.get(viewPager.getCurrentItem());
+                            task.setDayId(day.getId());
+                            task.save();
                             ArrayList<Task> tasks = day.getTasks();
-                            tasks.add(task);
+                            tasks.add(Task.findById(Task.class, task.getId()));
                             day.setTasks(tasks);
                             days.set(viewPager.getCurrentItem(), day);
                             viewPagerAdaper.notifyDataSetChanged();

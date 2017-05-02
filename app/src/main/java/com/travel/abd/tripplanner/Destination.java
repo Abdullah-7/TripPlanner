@@ -174,8 +174,8 @@ public class Destination extends SugarRecord implements Parcelable {
                 "\nTo: " + toDate +
                 "\nCurrency: " + currency +
                 "\nCost: " + cost +
-                "\nBudget: " + budget +
+                "\nBudget: " + budget;
 //                "\nDays: " + android.text.TextUtils.join(",", days) +
-                "\nLocation: " +location.toString();
+//                "\nLocation: " +location.toString();
     }
 }

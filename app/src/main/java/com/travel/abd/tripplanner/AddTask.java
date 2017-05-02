@@ -47,6 +47,7 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
     private Button add;
 
     private static Destination destination;
+    private long destinationId;
 
     private JSONArray countriesCodes;
 
@@ -101,9 +102,8 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
     private void getIntentData(){
         Intent intent = getIntent();
 
-        destination = intent.getParcelableExtra("destination");
-        cityname = intent.getStringExtra("city");
-        countryname = intent.getStringExtra("country");
+        destinationId = intent.getLongExtra("destination", 0);
+        destination = Destination.findById(Destination.class, destinationId);
     }
 
     @Override
@@ -139,7 +139,13 @@ public class AddTask extends AppCompatActivity implements View.OnClickListener, 
     public void onTimeSet(TimePicker timePicker, int i, int i1) {
         int hour = timePicker.getHour();
         int min = timePicker.getMinute();
-        time.setText(hour+":"+min);
+        String h = String.valueOf(hour);
+        if(h.length() == 1)
+            h = "0" + h;
+        String m = String.valueOf(min);
+        if(m.length() == 1)
+            m = "0" + m;
+        time.setText(h+":"+m);
 //        Toast.makeText(this, timePicker.getHour() + ":" + timePicker.getMinute(), Toast.LENGTH_SHORT).show();
     }
 

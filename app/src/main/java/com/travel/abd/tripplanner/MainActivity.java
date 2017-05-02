@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        d.setDays(array);
 //        d.save();
 //
-        Destination.deleteAll(Destination.class);
+
         list.addAll(Destination.listAll(Destination.class));
 //        list.add(d);
         //end of test
@@ -131,37 +131,56 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-        ArrayList<Day> days = new ArrayList<Day>();
+//        ArrayList<Day> days = new ArrayList<Day>();
         destination = (Destination) destinationAdapter.getItem(i);
 
-        Date startDate = destination.getFrom();
-        Date endDate = destination.getTo();
+//        Date startDate = destination.getFrom();
+//        Date endDate = destination.getTo();
+//
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTime(startDate);
+//
+//        Day day = new Day();
+//
+//        while (calendar.getTime().before(endDate)){
+//
+//            day = new Day();
+//            day.setDestinationId(destination.getId());
+//            day.setDate(calendar.getTime());
+//            days.add(day);
+//            calendar.add(calendar.DATE, 1);
+////            Log.d("Day", calendar.getTime().toString() + " - " + calendar.getTime().before(endDate));
+//        }
+//
+//        for (Day d : days) {
+//            d.save();
+////            Log.d("Day", d.getDate().toString() + " - " + d.getDate().before(endDate));
+//        }
+//        destination.setDays(days);
+        Intent intent = new Intent(this, DayActivity.class);
+        Log.d("destinationSend", destination.toString());
+        intent.putExtra("destination", destination.getId());
+        startActivity(intent);
+    }
+
+    private void saveDays(Date from, Date to, long id){
+        Date startDate = from;
+        Date endDate = to;
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(startDate);
 
-        Day day = new Day();
+        Day day;
 
         while (calendar.getTime().before(endDate)){
 
             day = new Day();
+            day.setDestinationId(id);
             day.setDate(calendar.getTime());
-            days.add(day);
+            day.save();
             calendar.add(calendar.DATE, 1);
 //            Log.d("Day", calendar.getTime().toString() + " - " + calendar.getTime().before(endDate));
         }
-
-        for (Day d : days) {
-//            Log.d("Day", d.getDate().toString() + " - " + d.getDate().before(endDate));
-        }
-//        destination.setDays(days);
-        Intent intent = new Intent(this, DayActivity.class);
-        intent.putExtra("city", destination.getName());
-        intent.putExtra("country", destination.getCountry());
-        intent.putParcelableArrayListExtra("days", days);
-        Log.d("destination", destination.toString());
-        intent.putExtra("destination", destination);
-        startActivity(intent);
     }
 
     private class GetPlaceDetails extends AsyncTask<String, Void, Destination> {
@@ -192,8 +211,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     final JSONObject jsonObject = new JSONObject(jsonResults.toString());
                     JSONObject result = (JSONObject)  jsonObject.get("result");
                     JSONArray address = result.getJSONArray("address_components");
-                    String city = address.getJSONObject(0).getString("long_name");
-                    String country = address.getJSONObject(2).getString("long_name");
+                    String city = "";
+                    String country = "";
+                    for (int i = 0 ; i < address.length() ; i++){
+                        JSONObject addressObject = address.getJSONObject(i);
+                        Log.d("Address", addressObject.getJSONArray("types").getString(0));
+                        if(addressObject.getJSONArray("types").getString(0).equals("locality"))
+                            city = addressObject.getString("long_name");
+                        else if(addressObject.getJSONArray("types").getString(0).equals("country"))
+                            country = addressObject.getString("long_name");
+                    }
+//                    city = address.getJSONObject(0).getString("long_name");
+//                    country = address.getJSONObject(2).getString("long_name");
                     Log.d("City", address.getJSONObject(0).getString("long_name"));
                     Log.d("City", address.getJSONObject(2).getString("long_name"));
                     JSONObject geometry = (JSONObject) result.get("geometry");
@@ -212,6 +241,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     destinationAdd.setCountry(country);
                     destinationAdd.setLocation(location1);
                     destinationAdd.save();
+
+                    saveDays(destinationAdd.getFrom(), destinationAdd.getTo(), destinationAdd.getId());
 
                     runOnUiThread(new Runnable() {
                         @Override

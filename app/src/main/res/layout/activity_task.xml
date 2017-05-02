@@ -72,8 +72,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="time"
-                android:id="@+id/time"
-                android:editable="false" />
+                android:id="@+id/time"/>
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -81,11 +80,10 @@
             android:layout_height="wrap_content">
 
             <EditText
+                android:id="@+id/cost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Cost"
-                android:editable="false"
-                android:id="@+id/cost" />
+                android:hint="Cost" />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
@@ -96,7 +94,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Budget"
-                android:editable="false"
                 android:id="@+id/budget" />
         </android.support.design.widget.TextInputLayout>
     </LinearLayout>

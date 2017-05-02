@@ -15,6 +15,7 @@ import java.util.Date;
 public class Day extends SugarRecord implements Parcelable {
 
     private long id;
+    private long destinationId;
     private Date date;
 
     //test
@@ -26,6 +27,14 @@ public class Day extends SugarRecord implements Parcelable {
 
     public Day(Parcel in){
         date = new Date(in.readLong());
+    }
+
+    public long getDestinationId() {
+        return destinationId;
+    }
+
+    public void setDestinationId(long destinationId) {
+        this.destinationId = destinationId;
     }
 
     public Date getDate() {
